@@ -26,7 +26,7 @@ env:
   # Enable a bit stricter compile flags
   DEVELOPER: 1
   # For the osx-installer build
-  OSX_VERSION: 10.6
+  OSX_VERSION: 10.15
   V: 1
 
 jobs:
@@ -74,9 +74,9 @@ jobs:
           cp git/git-$VERSION.tar.gz git/git-manpages-$VERSION.tar.gz build/ ||
           die "Could not copy .tar.gz files"
 
-          # drop the -isysroot `GIT_SDK` hack
-          sed -i .bak -e 's/ -isysroot .(SDK_PATH)//' Makefile ||
-          die "Could not drop the -isysroot hack"
+          #### # drop the -isysroot `GIT_SDK` hack
+          #### sed -i .bak -e 's/ -isysroot .(SDK_PATH)//' Makefile ||
+          #### die "Could not drop the -isysroot hack"
 
           # make sure that .../usr/local/git/share/man/ exists
           sed -i .bak -e 's/\(tar .*-C \)\(.*\/share\/man\)$/mkdir -p \2 \&\& &/' Makefile ||
@@ -88,7 +88,7 @@ jobs:
           # make vars
 
           PATH=/usr/local/bin:/System/Library/Frameworks:$PATH \
-          make build/intel-universal-snow-leopard/git-$VERSION/osx-built-keychain ||
+          make build/intel-x86_64-catalina/git-$VERSION/osx-built-keychain ||
           die "Build failed"
 
           PATH=/usr/local/bin:$PATH \

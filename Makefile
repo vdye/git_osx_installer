@@ -4,15 +4,47 @@ C_INCLUDE_PATH := /usr/include
 CPLUS_INCLUDE_PATH := /usr/include
 LD_LIBRARY_PATH := /usr/lib
 
-OSX_VERSION := 10.13
+# TODO Update to 10.15 which is the only SDK that I have installed
+# TODO (in /Applications/Xcode.app/...).
+# TODO We still need to decide what we really want to support.
+
+# OSX_VERSION := 10.13
+OSX_VERSION := 10.15
+
+# TODO Remove obsolete paths here.  Add /Library path because it does
+# TODO have the 10.14 SDK (which matches what I remember about Apple
+# TODO supporting the need for developers to support the previous
+# TODO release).
+
+SDK_PATH := $(shell bin/find-dir /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$(OSX_VERSION).sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform /Library/Developer/CommandLineTools/SDKs/MacOSX$(OSX_VERSION))
+
+# TODO Added -L before the SDK_PATH to avoid linker error:
+# TODO    ld: can't map file, errno=22 file '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk' for architecture x86_64
+#
+# TODO Removed -isysroot because I don't understand the issues enough
+# TODO yet and there is a step in the YML to try to remove it.  But
+# TODO this needs more study.
+
+TARGET_FLAGS := -mmacosx-version-min=$(OSX_VERSION) -L $(SDK_PATH) -DMACOSX_DEPLOYMENT_TARGET=$(OSX_VERSION)
+
+ifeq ("$(OSX_VERSION)", "10.13")
 OSX_NAME := "High Sierra"
-SDK_PATH := $(shell bin/find-dir  $(PWD)/MacOSX10.9.sdk /Developer/SDKs/MacOSX$(OSX_VERSION).sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$(OSX_VERSION).sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform)
-TARGET_FLAGS := -mmacosx-version-min=$(OSX_VERSION) -isysroot $(SDK_PATH) -DMACOSX_DEPLOYMENT_TARGET=$(OSX_VERSION)
+endif
+#
+# TODO Maybe add 10.14 here.
+#
+ifeq ("$(OSX_VERSION)", "10.15")
+OSX_NAME := Catalina
+endif
 
 OSX_CODE := $(shell echo "$(OSX_NAME)" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
 
-ARCH := Universal
-ARCH_CODE := universal
+# TODO Universal means Intel and Apple Silicon.  We need Xcode (I
+# TODO believe) 12.4+ to compile for both.  I have 11.3 on my laptop,
+# TODO so I can't test this.  Xcode 13 requires MacOS 11.2 or better.
+
+ARCH := x86_64
+ARCH_CODE := x86_64
 ARCH_FLAGS_universal := -arch x86_64
 ARCH_FLAGS_x86_64 := -arch x86_64
 
