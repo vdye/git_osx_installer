@@ -16,7 +16,7 @@ OSX_VERSION := 10.15
 # TODO supporting the need for developers to support the previous
 # TODO release).
 
-SDK_PATH := $(shell bin/find-dir /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$(OSX_VERSION).sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform /Library/Developer/CommandLineTools/SDKs/MacOSX$(OSX_VERSION))
+SDK_PATH := $(shell bin/find-dir /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$(OSX_VERSION).sdk /Library/Developer/CommandLineTools/SDKs/MacOSX$(OSX_VERSION))
 
 # TODO Added -L before the SDK_PATH to avoid linker error:
 # TODO    ld: can't map file, errno=22 file '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk' for architecture x86_64
