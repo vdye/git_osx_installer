@@ -27,6 +27,9 @@ SDK_PATH := $(shell bin/find-dir /Applications/Xcode.app/Contents/Developer/Plat
 
 TARGET_FLAGS := -mmacosx-version-min=$(OSX_VERSION) -L $(SDK_PATH) -DMACOSX_DEPLOYMENT_TARGET=$(OSX_VERSION)
 
+# Set a default.
+OSX_NAME := "Catalina"
+
 ifeq ("$(OSX_VERSION)", "10.13")
 OSX_NAME := "High Sierra"
 endif
