@@ -29,9 +29,14 @@ env:
   OSX_VERSION: 10.15
   V: 1
 
+  # For scalar testing
+  INCLUDE_SCALAR: 1
+
 jobs:
   build:
     runs-on: macos-latest
+    outputs:
+      with_scalar: ${{ steps.get_outputs.outputs.with_scalar }}    # Whether Scalar was built into this release
     steps:
       - uses: actions/checkout@v1
       - name: Install Git's dependencies
@@ -97,8 +102,60 @@ jobs:
 
           mkdir osx-installer &&
           mv *.dmg disk-image/*.pkg osx-installer/
+      - name: Determine whether Scalar is included in the build
+        run: |
+          if (find ./stage/git-*/usr/local/git/bin/scalar); then
+            echo "::set-output name=with_scalar::true"
+          else
+            echo "::set-output name=with_scalar::false"
+          fi
+        id: get_outputs
       - name: Upload osx-installer artifacts
         uses: actions/upload-artifact@v1
         with:
           name: osx-installer
           path: osx-installer
+
+  test-scalar:
+    if: needs.build.outputs.with_scalar == 'true'
+    needs: build
+    runs-on: macos-latest
+    steps:
+      - name: Install Scalar.NET
+        run: |
+          brew tap microsoft/git
+          brew install --cask scalar
+      - name: Download test installer
+        uses: actions/download-artifact@v2
+        with:
+          name: osx-installer
+          path: osx-installer
+      - name: Run test
+        run: |
+          set -x
+
+          # Verify Scalar.NET
+          ls -l $(which scalar)
+
+          # Create test repo
+          scalar clone "${GIT_REPOSITORY:-$FALLBACK_GIT_REPOSITORY}" test-repo
+          cd test-repo && scalar register && cd ..
+
+          # List Scalar.NET registrations
+          scalar list
+
+          # Install the scalar package
+          pkgpath=$(find ./osx-installer/*.pkg)
+          sudo installer -verbose -pkg $pkgpath -target /
+
+          # List homebrew package
+          brew list --cask scalar || echo "Scalar not found!"
+
+          # Verify Scalar C
+          ls -l $(which scalar)
+
+          # List Scalar C registrations
+          scalar list
+
+          # DEBUG: print install log
+          tail -n 150 /var/log/install.log
