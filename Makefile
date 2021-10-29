@@ -184,7 +184,7 @@ disk-image/VERSION-$(VERSION)-$(ARCH_CODE)-$(OSX_CODE):
 	touch "$@"
 
 disk-image/git-$(VERSION)-$(BUILD_CODE).pkg: disk-image/VERSION-$(VERSION)-$(ARCH_CODE)-$(OSX_CODE) $(DESTDIR)$(GIT_PREFIX)/VERSION-$(VERSION)-$(BUILD_CODE) $(BUILD_DIR)/git-$(VERSION)/osx-installed $(BUILD_DIR)/git-$(VERSION)/osx-built-assert-$(ARCH_CODE)
-	pkgbuild --identifier com.git.pkg --version $(VERSION) --root $(DESTDIR)$(PREFIX) --install-location $(PREFIX) --component-plist ./git-components.plist disk-image/git-$(VERSION)-$(BUILD_CODE).pkg
+	pkgbuild --identifier com.git.pkg --version $(VERSION) --root $(DESTDIR)$(PREFIX) --scripts scripts --install-location $(PREFIX) --component-plist ./git-components.plist disk-image/git-$(VERSION)-$(BUILD_CODE).pkg
 
 git-%-$(BUILD_CODE).dmg: disk-image/git-%-$(BUILD_CODE).pkg
 	rm -f git-$(VERSION)-$(BUILD_CODE)*.dmg
